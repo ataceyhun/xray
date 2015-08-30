@@ -203,220 +203,44 @@ void CRender::Render		()
 	if( !(g_pGameLevel && g_pGameLevel->pHUD) || bMenu)	return;
 //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
 
-	// Configure
-	RImplementation.o.distortion				= FALSE;		// disable distorion
-	Fcolor					sun_color			= ((light*)Lights.sun_adapted._get())->color;
-	BOOL					bSUN				= ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r,sun_color.g,sun_color.b)>EPS);
-	if (o.sunstatic)		bSUN				= FALSE;
-	// Msg						("sstatic: %s, sun: %s",o.sunstatic?"true":"false", bSUN?"true":"false");
+	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	// Begin
+	//Target->Begin();
+	//o.vis_intersect = FALSE;
+	phase = PHASE_NORMAL;
+	r_dsgraph_render_hud();				// hud
+	r_dsgraph_render_graph(0);			// normal level
+	if (Details)Details->Render();				// grass / details
+	r_dsgraph_render_lods(true, false);	// lods - FB
 
-	// HOM
-	ViewBase.CreateFromMatrix					(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
-	View										= 0;
-	if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
-		HOM.Enable									();
-		HOM.Render									(ViewBase);
+	//g_pGamePersistent->Environment().RenderSky();				// sky / sun
+	//g_pGamePersistent->Environment().RenderClouds();				// clouds
+
+	r_pmask(true, false);	// disable priority "1"
+	//o.vis_intersect = TRUE;
+	HOM.Disable();
+	//L_Dynamic->render();				// addititional light sources
+	if (Wallmarks){
+		g_r = 0;
+		Wallmarks->Render();				// wallmarks has priority as normal geometry
 	}
+	HOM.Enable();
+	//o.vis_intersect = FALSE;
+	phase = PHASE_NORMAL;
+	r_pmask(true, true);	// enable priority "0" and "1"
+	//if (L_Shadows)L_Shadows->render();				// ... and shadows
+	r_dsgraph_render_lods(false, true);	// lods - FB
+	r_dsgraph_render_graph(1);			// normal level, secondary priority
+	PortalTraverser.fade_render();				// faded-portals
+	r_dsgraph_render_sorted();				// strict-sorted geoms
+	//if (L_Glows)L_Glows->Render();				// glows
+	//g_pGamePersistent->Environment().RenderFlares();				// lens-flares
+	//g_pGamePersistent->Environment().RenderLast();				// rain/thunder-bolts
 
-	//******* Z-prefill calc - DEFERRER RENDERER
-	if (ps_r2_ls_flags.test(R2FLAG_ZFILL))		{
-		Device.Statistic->RenderCALC.Begin			();
-		float		z_distance	= ps_r2_zfill		;
-		Fmatrix		m_zfill, m_project				;
-		m_project.build_projection	(
-			deg2rad(Device.fFOV/* *Device.fASPECT*/), 
-			Device.fASPECT, VIEWPORT_NEAR, 
-			z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
-		m_zfill.mul	(m_project,Device.mView);
-		r_pmask										(true,false);	// enable priority "0"
-		set_Recorder								(NULL)		;
-		phase										= PHASE_SMAP;
-		render_main									(m_zfill,false)	;
-		r_pmask										(true,false);	// disable priority "1"
-		Device.Statistic->RenderCALC.End				( )			;
-
-		// flush
-		Target->phase_scene_prepare					();
-		RCache.set_ColorWriteEnable					(FALSE);
-		r_dsgraph_render_graph						(0);
-		RCache.set_ColorWriteEnable					( );
-	} else {
-		Target->phase_scene_prepare					();
-	}
-
-	//*******
-	// Sync point
-	Device.Statistic->RenderDUMP_Wait_S.Begin();
-	CHK_GL(q_sync_point[q_sync_count] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
-	CHK_GL(glClientWaitSync(q_sync_point[q_sync_count], GL_SYNC_FLUSH_COMMANDS_BIT, 500));
-	CHK_GL(glDeleteSync(q_sync_point[q_sync_count]));
-	Device.Statistic->RenderDUMP_Wait_S.End		();
-	q_sync_count								= (q_sync_count+1)%HW.Caps.iGPUNum;
-
-	//******* Main calc - DEFERRER RENDERER
-	// Main calc
-	Device.Statistic->RenderCALC.Begin			();
-	r_pmask										(true,false,true);	// enable priority "0",+ capture wmarks
-	if (bSUN)									set_Recorder	(&main_coarse_structure);
-	else										set_Recorder	(NULL);
-	phase										= PHASE_NORMAL;
-	render_main									(Device.mFullTransform,true);
-	set_Recorder								(NULL);
-	r_pmask										(true,false);	// disable priority "1"
-	Device.Statistic->RenderCALC.End			();
-
-	BOOL	split_the_scene_to_minimize_wait		= FALSE;
-	if (ps_r2_ls_flags.test(R2FLAG_EXP_SPLIT_SCENE))	split_the_scene_to_minimize_wait=TRUE;
-
-	//******* Main render :: PART-0	-- first
-	if (!split_the_scene_to_minimize_wait)
-	{
-		// level, DO NOT SPLIT
-		Target->phase_scene_begin				();
-		r_dsgraph_render_hud					();
-		r_dsgraph_render_graph					(0);
-		r_dsgraph_render_lods					(true,true);
-		if(Details)	Details->Render				();
-		Target->phase_scene_end					();
-	} else {
-		// level, SPLIT
-		Target->phase_scene_begin				();
-		r_dsgraph_render_graph					(0);
-		Target->disable_aniso					();
-	}
-
-	//******* Occlusion testing of volume-limited light-sources
-	Target->phase_occq							();
-	LP_normal.clear								();
-	LP_pending.clear							();
-	{
-		// perform tests
-		u32	count			= 0;
-		light_Package&	LP	= Lights.package;
-
-		// stats
-		stats.l_shadowed	= LP.v_shadowed.size();
-		stats.l_unshadowed	= LP.v_point.size() + LP.v_spot.size();
-		stats.l_total		= stats.l_shadowed + stats.l_unshadowed;
-
-		// perform tests
-		count				= _max	(count,LP.v_point.size());
-		count				= _max	(count,LP.v_spot.size());
-		count				= _max	(count,LP.v_shadowed.size());
-		for (u32 it=0; it<count; it++)	{
-			if (it<LP.v_point.size())		{
-				light*	L			= LP.v_point	[it];
-				L->vis_prepare		();
-				if (L->vis.pending)	LP_pending.v_point.push_back	(L);
-				else				LP_normal.v_point.push_back		(L);
-			}
-			if (it<LP.v_spot.size())		{
-				light*	L			= LP.v_spot		[it];
-				L->vis_prepare		();
-				if (L->vis.pending)	LP_pending.v_spot.push_back		(L);
-				else				LP_normal.v_spot.push_back		(L);
-			}
-			if (it<LP.v_shadowed.size())	{
-				light*	L			= LP.v_shadowed	[it];
-				L->vis_prepare		();
-				if (L->vis.pending)	LP_pending.v_shadowed.push_back	(L);
-				else				LP_normal.v_shadowed.push_back	(L);
-			}
-		}
-	}
-	LP_normal.sort							();
-	LP_pending.sort							();
-
-	//******* Main render :: PART-1 (second)
-	if (split_the_scene_to_minimize_wait)	{
-		// skybox can be drawn here
-		if (0)
-		{
-			Target->u_setrt		( Target->rt_Generic_0,	Target->rt_Generic_1,0,RCache.pBaseZB );
-			RCache.set_CullMode	( CULL_NONE );
-			RCache.set_Stencil	( FALSE		);
-
-			// draw skybox
-			RCache.set_ColorWriteEnable					();
-			RCache.set_Z								(FALSE);
-			g_pGamePersistent->Environment().RenderSky();
-			RCache.set_Z								(TRUE);
-		}
-
-		// level
-		Target->phase_scene_begin				();
-		r_dsgraph_render_hud					();
-		r_dsgraph_render_lods					(true,true);
-		if(Details)	Details->Render				();
-		Target->phase_scene_end					();
-	}
-
-	if (g_hud && g_hud->RenderActiveItemUIQuery())
-	{
-		Target->phase_wallmarks();
-		r_dsgraph_render_hud_ui();
-	}
-
-	// Wall marks
-	if(Wallmarks)	{
-		Target->phase_wallmarks					();
-		g_r										= 0;
-		Wallmarks->Render						();				// wallmarks has priority as normal geometry
-	}
-
-	// Update incremental shadowmap-visibility solver
-	{
-		u32 it=0;
-		for (it=0; it<Lights_LastFrame.size(); it++)	{
-			if (0==Lights_LastFrame[it])	continue	;
-			try {
-				Lights_LastFrame[it]->svis.flushoccq()	;
-			} catch (...)
-			{
-				Msg	("! Failed to flush-OCCq on light [%d] %X",it,*(u32*)(&Lights_LastFrame[it]));
-			}
-		}
-		Lights_LastFrame.clear	();
-	}
-
-	// Directional light - fucking sun
-	if (bSUN)	{
-		RImplementation.stats.l_visible		++;
-		render_sun_near						();
-		render_sun							();
-		render_sun_filtered					();
-		Target->accum_direct_blend			();
-	}
-
-	{
-		Target->phase_accumulator					();
-		// Render emissive geometry, stencil - write 0x0 at pixel pos
-		RCache.set_xform_project					(Device.mProject); 
-		RCache.set_xform_view						(Device.mView);
-		// Stencil - write 0x1 at pixel pos - 
-		RCache.set_Stencil							( TRUE,D3DCMP_ALWAYS,0x01,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		//RCache.set_Stencil						(TRUE,D3DCMP_ALWAYS,0x00,0xff,0xff,D3DSTENCILOP_KEEP,D3DSTENCILOP_REPLACE,D3DSTENCILOP_KEEP);
-		RCache.set_CullMode							(CULL_CCW);
-		RCache.set_ColorWriteEnable					();
-		RImplementation.r_dsgraph_render_emissive	();
-
-		// Stencil	- draw only where stencil >= 0x1
-		RCache.set_Stencil					(TRUE,D3DCMP_LESSEQUAL,0x01,0xff,0x00);
-		RCache.set_CullMode					(CULL_NONE);
-		RCache.set_ColorWriteEnable			();
-	}
-
-	// Lighting, non dependant on OCCQ
-	Target->phase_accumulator				();
-	HOM.Disable								();
-	render_lights							(LP_normal);
-	
-	// Lighting, dependant on OCCQ
-	render_lights							(LP_pending);
-
-	// Postprocess
-	Target->phase_combine					();
-	VERIFY	(0==mapDistort.size());
+	// Postprocess, if necessary
+	//Target->End();
+	//if (L_Projector) L_Projector->finalize();
 }
 
 void CRender::render_forward				()
