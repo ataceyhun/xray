@@ -10,8 +10,6 @@
 #include "../xrRender/blenders\blender.h"
 #include "../xrRender/blenders\blender_recorder.h"
 
-#include "../xrRenderGL/glBufferUtils.h"
-
 void fix_texture_name(LPSTR fn);
 
 void simplify_texture(string_path &fn)
@@ -117,10 +115,8 @@ SDeclaration*	CResourceManager::_CreateDecl	(u32 FVF)
 	}
 
 	SDeclaration* D = new SDeclaration();
-	glGenVertexArrays(1, &D->vao);
 
 	D->FVF = FVF;
-	glBufferUtils::ConvertVertexDeclaration(FVF, D->vao);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 
@@ -137,12 +133,10 @@ SDeclaration*	CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 	}
 
 	SDeclaration* D = new SDeclaration();
-	glGenVertexArrays(1, &D->vao);
 
 	D->FVF = 0;
 	u32 dcl_size = glBufferUtils::GetDeclLength(dcl) + 1;
 	D->dcl_code.assign(dcl, dcl + dcl_size);
-	glBufferUtils::ConvertVertexDeclaration(dcl, D->vao);
 	D->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 	v_declarations.push_back(D);
 

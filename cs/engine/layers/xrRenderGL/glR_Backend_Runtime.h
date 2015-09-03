@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../xrRenderGL/glStateUtils.h"
+#include "../xrRenderGL/glBufferUtils.h"
 
 IC void		CBackend::set_xform(u32 ID, const Fmatrix& M)
 {
@@ -55,7 +56,11 @@ ICF void CBackend::set_Format(SDeclaration* _decl)
 		stat.decl++;
 #endif
 		decl = _decl;
-		CHK_GL(glBindVertexArray(_decl->vao));
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		if (decl->dcl_code.empty())
+			glBufferUtils::ConvertVertexDeclaration(decl->FVF);
+		else
+			glBufferUtils::ConvertVertexDeclaration(decl->dcl_code.data());
 	}
 }
 
