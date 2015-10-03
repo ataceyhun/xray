@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\hlslcc_malloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\decode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\decodeDX9.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\reflect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\toGLSL.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\toGLSLInstruction.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\toGLSLOperand.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\toGLSLDeclaration.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bsafe.c">
+      <Filter>CBString Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bstraux.c">
+      <Filter>CBString Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bstrlib.c">
+      <Filter>CBString Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\decode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\languages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\include\pstdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\reflect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\include\hlslcc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\toGLSLDeclaration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\toGLSLInstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\toGLSLOperand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\tokensDX9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\shaderLimits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\internal_includes\hlslcc_malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bsafe.h">
+      <Filter>CBString Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bstraux.h">
+      <Filter>CBString Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\src\cbstring\bstrlib.h">
+      <Filter>CBString Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Armada\Source\xray\cs\3rd party\HLSLCrossCompiler\mk\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{97D8AD39-5C77-4566-9238-7A50759DA540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C4D36961-D47E-433D-A28E-A22EF3F7D0EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CBString Files">
+      <UniqueIdentifier>{D8277F35-62B1-4C24-8D95-9012BDFF64BC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

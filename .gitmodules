@@ -13,3 +13,6 @@
 [submodule "cs/3rd party/gli"]
 	path = cs/3rd party/gli
 	url = https://github.com/g-truc/gli.git
+[submodule "cs/3rd party/HLSLCrossCompiler"]
+	path = cs/3rd party/HLSLCrossCompiler
+	url = https://github.com/James-Jones/HLSLCrossCompiler.git

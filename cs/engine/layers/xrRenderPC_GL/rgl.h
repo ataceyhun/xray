@@ -268,7 +268,7 @@ public:
 	// Information
 	virtual	void					Statistics(CGameFont* F)							{ VERIFY(!"CRender::Statistics not implemented."); };
 
-	virtual LPCSTR					getShaderPath()									{ return "gl\\"; }
+	virtual LPCSTR					getShaderPath()									{ return "r3\\"; }
 	virtual ref_shader				getShader(int id) { VERIFY(id<int(Shaders.size()));	return Shaders[id]; };
 	virtual IRender_Sector*			getSector(int id) { VERIFY(id<int(Sectors.size()));	return Sectors[id]; };
 	virtual IRenderVisual*			getVisual(int id) { VERIFY(id<int(Visuals.size()));	return Visuals[id]; };

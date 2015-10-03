@@ -4,6 +4,7 @@
 #include "glWallMarkArray.h"
 #include "glUIShader.h"
 #include "glRenderDeviceRender.h"
+#include "hlslcc.h"
 
 CHW			HW;
 CRender		RImplementation;
