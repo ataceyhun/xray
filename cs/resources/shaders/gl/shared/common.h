@@ -18,16 +18,16 @@
 #define int4        ivec4
 #define half3x3     mat3
 #define half4x4     mat4
-#define half3x4     mat3x4
+#define half3x4     mat4x3
 #define float3x3    mat3
 #define float4x4    mat4
-#define float3x4    mat3x4
+#define float3x4    mat4x3
 
 #define lerp        mix
 #define frac        fract
 #define saturate(a) clamp(a, 0.0, 1.0)
 #define clip(x)		if (x < 0) discard
-#define mul(a,b)	(a * b)
+#define mul(a,b)	(b * a)
 #define tex2D		texture2D
 #define tex2Dproj	textureProj
 #define tex2Dlod	textureLod

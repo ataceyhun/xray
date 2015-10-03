@@ -8,26 +8,31 @@ private:
 	// fp, non-array versions
 	ICF void				set(R_constant* C, R_constant_load& L, const Fmatrix& A)		{
 		VERIFY(RC_float == C->type);
-		Fvector4	it[4];
+		Fvector4	it4[4];
+		Fvector3	it3[4];
+		Fvector2	it2[4];
 		switch (L.cls)
 		{
 		case RC_2x4:
-			it[0].set(A._11, A._21, A._31, A._41);
-			it[1].set(A._12, A._22, A._32, A._42);
-			CHK_GL(glProgramUniformMatrix2x4fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
+			it2[0].set(A._11, A._12);
+			it2[1].set(A._21, A._22);
+			it2[2].set(A._31, A._32);
+			it2[3].set(A._41, A._42);
+			CHK_GL(glProgramUniformMatrix4x2fv(L.program, L.location, 1, GL_FALSE, (float*)&it2));
 			break;
 		case RC_3x4:
-			it[0].set(A._11, A._21, A._31, A._41);
-			it[1].set(A._12, A._22, A._32, A._42);
-			it[2].set(A._13, A._23, A._33, A._43);
-			CHK_GL(glProgramUniformMatrix3x4fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
+			it3[0].set(A._11, A._12, A._13);
+			it3[1].set(A._21, A._22, A._23);
+			it3[2].set(A._31, A._32, A._33);
+			it3[3].set(A._41, A._42, A._43);
+			CHK_GL(glProgramUniformMatrix4x3fv(L.program, L.location, 1, GL_FALSE, (float*)&it3));
 			break;
 		case RC_4x4:
-			it[0].set(A._11, A._21, A._31, A._41);
-			it[1].set(A._12, A._22, A._32, A._42);
-			it[2].set(A._13, A._23, A._33, A._43);
-			it[3].set(A._14, A._24, A._34, A._44);
-			CHK_GL(glProgramUniformMatrix4fv(L.program, L.location, 1, GL_TRUE, (float*)&it));
+			it4[0].set(A._11, A._21, A._31, A._41);
+			it4[1].set(A._12, A._22, A._32, A._42);
+			it4[2].set(A._13, A._23, A._33, A._43);
+			it4[3].set(A._14, A._24, A._34, A._44);
+			CHK_GL(glProgramUniformMatrix4fv(L.program, L.location, 1, GL_FALSE, (float*)&it4));
 			break;
 		default:
 #ifdef DEBUG
